@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -38,6 +38,33 @@ const submitMessage = (event: KeyboardEvent) => {
     input.value.value = ''
   }
 }
+
+const connectHandler = () => {
+  console.log('connected')
+}
+
+const disconnectHandler = () => {
+  console.log('disconnected')
+}
+
+const messageHandler = () => {
+  console.log('sent message')
+}
+
+const errorHandler = (e) => {
+  console.log('e', e)
+}
+
+onMounted(() => {
+  const socket = new WebSocket(
+    'wss://6s0eopwa31.execute-api.us-east-1.amazonaws.com',
+  )
+
+  socket.onopen = connectHandler
+  socket.onmessage = messageHandler
+  socket.onerror = errorHandler
+  socket.onclose = disconnectHandler
+})
 </script>
 
 <style lang="scss" scoped>
@@ -49,7 +76,7 @@ const submitMessage = (event: KeyboardEvent) => {
   height: 100%;
 
   &__messages {
-    border: solid 1px white;
+    border: solid 1px var(--color-border);
     border-radius: 10px;
     padding: 10px;
     display: flex;
