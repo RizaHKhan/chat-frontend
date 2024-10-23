@@ -21,6 +21,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const user = route.params.user
 const input: Ref<HTMLFormElement | null> = ref(null)
+const socket: Ref<WebSocket | null> = ref(null)
 const currentUser = ref('khanr')
 const chats = ref([
   { user, message: 'Hello' },
@@ -33,6 +34,16 @@ const submitMessage = (event: KeyboardEvent) => {
   event.preventDefault()
   const { value: message } = event.target as HTMLFormElement
   chats.value.push({ user: currentUser.value, message })
+
+  if (socket?.value?.readyState === WebSocket.OPEN) {
+    console.log('message send to socket')
+    socket.value.send(
+      JSON.stringify({
+        action: 'message',
+        message: { user: currentUser.value, message },
+      }),
+    )
+  }
 
   if (input?.value?.value) {
     input.value.value = ''
@@ -47,8 +58,9 @@ const disconnectHandler = () => {
   console.log('disconnected')
 }
 
-const messageHandler = () => {
-  console.log('sent message')
+const messageHandler = (event: MessageEvent) => {
+  const receivedMessage = JSON.parse(event.data)
+  chats.value.push(receivedMessage)
 }
 
 const errorHandler = (e: Event) => {
@@ -56,14 +68,14 @@ const errorHandler = (e: Event) => {
 }
 
 onMounted(() => {
-  const socket = new WebSocket(
-    'wss://6s0eopwa31.execute-api.us-east-1.amazonaws.com/dev'
+  socket.value = new WebSocket(
+    'wss://6s0eopwa31.execute-api.us-east-1.amazonaws.com/dev',
   )
 
-  socket.onopen = connectHandler
-  socket.onmessage = messageHandler
-  socket.onerror = errorHandler
-  socket.onclose = disconnectHandler
+  socket.value.onopen = connectHandler
+  socket.value.onmessage = messageHandler
+  socket.value.onerror = errorHandler
+  socket.value.onclose = disconnectHandler
 })
 </script>
 
