@@ -57,7 +57,7 @@ const errorHandler = (e: Event) => {
 
 onMounted(() => {
   const socket = new WebSocket(
-    'wss://6s0eopwa31.execute-api.us-east-1.amazonaws.com',
+    'wss://6s0eopwa31.execute-api.us-east-1.amazonaws.com/dev'
   )
 
   socket.onopen = connectHandler
