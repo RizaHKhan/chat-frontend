@@ -51,7 +51,7 @@ const messageHandler = () => {
   console.log('sent message')
 }
 
-const errorHandler = (e) => {
+const errorHandler = (e: Event) => {
   console.log('e', e)
 }
 
